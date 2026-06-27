@@ -438,7 +438,8 @@ const sentences = [
   {
     direct: 'He said, "I spotted a beautiful golden dragonfly in the secret garden yesterday."',
     prefix: "He said that",
-    answer: "he had spotted a beautiful golden dragonfly in the secret garden the day before."
+    answer: "he had spotted a beautiful golden dragonfly in the secret garden the day before.",
+    alts: ["he had spotted a beautiful golden dragonfly in the secret garden the previous day."]
   },
   {
     direct: 'She told me, "I don\'t believe anyone has ever lived in that abandoned house."',
@@ -448,12 +449,14 @@ const sentences = [
   {
     direct: 'They said, "We are planning a trip to a remote island next summer."',
     prefix: "They said that",
-    answer: "they were planning a trip to a remote island the following summer."
+    answer: "they were planning a trip to a remote island the following summer.",
+    alts: ["they were planning a trip to a remote island the next summer."]
   },
   {
     direct: 'Mark asked, "Did you hear those unusual noises coming from the attic last night?"',
     prefix: "Mark asked if",
-    answer: "I had heard those unusual noises coming from the attic the night before."
+    answer: "I had heard those unusual noises coming from the attic the night before.",
+    alts: ["I had heard those unusual noises coming from the attic the previous night."]
   },
   {
     direct: 'The journalist asked, "Why are so many people suddenly interested in this old legend?"',
@@ -648,13 +651,17 @@ function checkAnswer(i) {
   const userAnswer = input.value.trim();
   if (!userAnswer) return;
 
-  const correct = sentences[i].answer;
+  const s = sentences[i];
+  const allAnswers = [s.answer, ...(s.alts || [])];
 
-  if (isAcceptable(userAnswer, correct)) {
+  // Find which accepted answer the user matched
+  const matchedAnswer = allAnswers.find(a => isAcceptable(userAnswer, a));
+
+  if (matchedAnswer) {
     // ✅ Correct
     solved[i] = true;
     correctCount++;
-    input.value = correct; // snap to correct spelling
+    input.value = matchedAnswer; // snap to whichever variant they matched
     autoGrow(input);
     input.classList.add('correct');
     input.disabled = true;
